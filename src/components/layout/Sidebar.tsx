@@ -22,7 +22,7 @@ function InventoryGroup({
         onClick={onToggle}
         className={cn(
           'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-150',
-          'text-white/90 hover:bg-maroon-dark hover:text-white',
+          'text-white/90 hover:bg-sidebar-hover hover:text-white',
         )}
       >
         {group.icon && <group.icon className="h-4 w-4 shrink-0" />}
@@ -58,16 +58,14 @@ export function Sidebar() {
   const [inventoryOpen, setInventoryOpen] = useState(isInventoryActive)
 
   return (
-    <aside className="fixed left-0 top-0 z-40 flex h-screen w-[250px] flex-col bg-maroon">
+    <aside className="fixed left-0 top-0 z-40 flex h-screen w-[250px] flex-col bg-sidebar">
       <div className="px-5 py-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white p-1.5 shadow-sm">
-            <img
-              src="/logo.png"
-              alt="ResponsivCode"
-              className="h-full w-full object-contain"
-            />
-          </div>
+          <img
+            src="/logo.png"
+            alt="ResponsivCode"
+            className="h-10 w-10 shrink-0 object-contain bg-transparent mix-blend-lighten"
+          />
           <div>
             <div className="text-sm font-bold tracking-wide text-white">RESPONSIVCODE</div>
             <div className="text-xs text-white/80">ERP</div>

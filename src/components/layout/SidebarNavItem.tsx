@@ -27,7 +27,7 @@ export function SidebarNavItem({
           indent && 'ml-4',
           isActive
             ? 'mx-2 bg-maroon-light text-maroon font-semibold'
-            : 'text-white/90 hover:bg-maroon-dark hover:text-white',
+            : 'text-white/90 hover:bg-sidebar-hover hover:text-white',
         )
       }
     >

@@ -3,6 +3,8 @@
 @theme {
   --color-maroon: #A30F23;
   --color-maroon-dark: #821019;
+  --color-sidebar: #6F1832;
+  --color-sidebar-hover: #581624;
   --color-maroon-light: #FCE8EC;
   --color-brand-orange: #F9A61A;
   --color-surface: #FFFFFF;
@@ -39,4 +41,38 @@ body {
 
 #root {
   min-height: 100vh;
+}
+
+@media print {
+  body {
+    background: white;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  aside,
+  header,
+  nav {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .ml-\[250px\] {
+    margin-left: 0 !important;
+  }
+
+  .print-document {
+    max-width: none;
+    width: 100%;
+    min-height: auto;
+    border: none;
+    box-shadow: none;
+    padding: 20mm;
+  }
 }

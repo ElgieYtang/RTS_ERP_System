@@ -1,8 +1,23 @@
 import { AppLayout } from '@/components/layout/AppLayout'
+import { AccomplishmentPage } from '@/pages/Accomplishment'
+import { BillingPage } from '@/pages/Billing'
+import { CustomersPage } from '@/pages/Customers'
 import { DashboardPage } from '@/pages/Dashboard'
-import { DocumentPreviewPage } from '@/pages/DocumentPreview'
-import { PlaceholderPage } from '@/pages/PlaceholderPage'
+import { DeliveryReceiptsPage } from '@/pages/DeliveryReceipts'
+import { InventoryOverviewPage } from '@/pages/InventoryOverview'
+import { OutslipsPage } from '@/pages/Outslips'
+import { ProductsPage } from '@/pages/Products'
+import { PurchaseOrdersPage } from '@/pages/PurchaseOrders'
 import { QuotationsPage } from '@/pages/Quotations'
+import { ReceivingPage } from '@/pages/Receiving'
+import { SOAPage } from '@/pages/SOA'
+import { SuppliersPage } from '@/pages/Suppliers'
+import { AccomplishmentPreviewPage } from '@/pages/previews/AccomplishmentPreview'
+import { DeliveryReceiptPreviewPage } from '@/pages/previews/DeliveryReceiptPreview'
+import { PurchaseOrderPreviewPage } from '@/pages/previews/PurchaseOrderPreview'
+import { QuotationPreviewPage } from '@/pages/previews/QuotationPreview'
+import { SOAPreviewPage } from '@/pages/previews/SOAPreview'
+import { PlaceholderPage } from '@/pages/PlaceholderPage'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 export default function App() {
@@ -12,105 +27,22 @@ export default function App() {
         <Route element={<AppLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="quotations" element={<QuotationsPage />} />
-          <Route
-            path="purchase-orders"
-            element={
-              <PlaceholderPage
-                title="Purchase Orders"
-                description="Manage purchase orders linked to approved quotations."
-              />
-            }
-          />
-          <Route
-            path="inventory"
-            element={
-              <PlaceholderPage
-                title="Inventory Overview"
-                description="View current stock levels and inventory status."
-              />
-            }
-          />
-          <Route
-            path="inventory/receiving"
-            element={
-              <PlaceholderPage
-                title="Receiving"
-                description="Record incoming goods and update inventory."
-              />
-            }
-          />
-          <Route
-            path="inventory/outslips"
-            element={
-              <PlaceholderPage
-                title="Outslips"
-                description="Manage outgoing inventory and outslip documents."
-              />
-            }
-          />
-          <Route
-            path="delivery-receipts"
-            element={
-              <PlaceholderPage
-                title="Delivery Receipts"
-                description="Track and confirm customer deliveries."
-              />
-            }
-          />
-          <Route
-            path="billing"
-            element={
-              <PlaceholderPage
-                title="Billing"
-                description="Generate and manage billing records."
-              />
-            }
-          />
-          <Route
-            path="soa"
-            element={
-              <PlaceholderPage
-                title="Statement of Account"
-                description="Generate and manage customer SOA documents."
-              />
-            }
-          />
-          <Route
-            path="customers"
-            element={
-              <PlaceholderPage
-                title="Customers"
-                description="Manage customer master data."
-              />
-            }
-          />
-          <Route
-            path="suppliers"
-            element={
-              <PlaceholderPage
-                title="Suppliers"
-                description="Manage supplier master data."
-              />
-            }
-          />
-          <Route
-            path="products"
-            element={
-              <PlaceholderPage
-                title="Products"
-                description="Manage product catalog and pricing."
-              />
-            }
-          />
-          <Route
-            path="reports/accomplishment"
-            element={
-              <PlaceholderPage
-                title="Accomplishment Reports"
-                description="View workflow accomplishment and completion reports."
-              />
-            }
-          />
+          <Route path="quotations/:id/preview" element={<QuotationPreviewPage />} />
+          <Route path="purchase-orders" element={<PurchaseOrdersPage />} />
+          <Route path="purchase-orders/:id/preview" element={<PurchaseOrderPreviewPage />} />
+          <Route path="inventory" element={<InventoryOverviewPage />} />
+          <Route path="inventory/receiving" element={<ReceivingPage />} />
+          <Route path="inventory/outslips" element={<OutslipsPage />} />
+          <Route path="delivery-receipts" element={<DeliveryReceiptsPage />} />
+          <Route path="delivery-receipts/:id/preview" element={<DeliveryReceiptPreviewPage />} />
+          <Route path="billing" element={<BillingPage />} />
+          <Route path="soa" element={<SOAPage />} />
+          <Route path="soa/preview" element={<SOAPreviewPage />} />
+          <Route path="customers" element={<CustomersPage />} />
+          <Route path="suppliers" element={<SuppliersPage />} />
+          <Route path="products" element={<ProductsPage />} />
+          <Route path="reports/accomplishment" element={<AccomplishmentPage />} />
+          <Route path="reports/accomplishment/preview" element={<AccomplishmentPreviewPage />} />
           <Route
             path="settings"
             element={
@@ -120,7 +52,6 @@ export default function App() {
               />
             }
           />
-          <Route path="document-preview" element={<DocumentPreviewPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

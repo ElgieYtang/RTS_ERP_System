@@ -1,6 +1,8 @@
 export const colors = {
   maroon: '#A30F23',
   maroonDark: '#821019',
+  sidebar: '#6F1832',
+  sidebarHover: '#581624',
   maroonLight: '#FCE8EC',
   brandOrange: '#F9A61A',
   white: '#FFFFFF',

@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 import { type HTMLAttributes } from 'react'
 
-type BadgeVariant =
+export type BadgeVariant =
   | 'approved'
   | 'pending'
   | 'rejected'
