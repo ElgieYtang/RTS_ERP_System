@@ -107,8 +107,7 @@ export function DashboardPage() {
       {/* Mobile dashboard */}
       <div className="md:hidden">
         <div className="mb-5">
-          <h1 className="text-xl font-bold text-text-primary">Good morning, Admin</h1>
-          <p className="mt-1 text-sm text-text-secondary">
+          <p className="text-sm text-text-secondary">
             Here&apos;s an overview of today&apos;s transactions.
           </p>
         </div>

@@ -45,6 +45,18 @@ body {
   min-height: 100vh;
 }
 
+/* Keep autofill inputs white (browsers default to yellow) */
+input.login-field:-webkit-autofill,
+input.login-field:-webkit-autofill:hover,
+input.login-field:-webkit-autofill:focus,
+input.login-field:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+  box-shadow: 0 0 0 1000px #ffffff inset;
+  -webkit-text-fill-color: var(--color-text-primary);
+  caret-color: var(--color-text-primary);
+  transition: background-color 99999s ease-out 0s;
+}
+
 @media print {
   body {
     background: white;

@@ -10,7 +10,7 @@ const mobileTitles: Record<string, string> = {
   '/purchase-order': 'Purchase Orders',
   '/outslip': 'Outslip',
   '/delivery-receipt': 'Delivery Receipt',
-  '/settings': 'Settings',
+  '/reports/accomplishment': 'Accomplishments',
 }
 
 function getMobileTitle(pathname: string) {
@@ -19,6 +19,7 @@ function getMobileTitle(pathname: string) {
   if (pathname.startsWith('/purchase-order/')) return 'Purchase Order'
   if (pathname.startsWith('/outslip/')) return 'Outslip'
   if (pathname.startsWith('/delivery-receipt/')) return 'Delivery Receipt'
+  if (pathname.startsWith('/reports/accomplishment')) return 'Accomplishments'
   return 'ResponsivCode ERP'
 }
 

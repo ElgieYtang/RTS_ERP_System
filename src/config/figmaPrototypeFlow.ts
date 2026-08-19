@@ -23,7 +23,7 @@ export const FIGMA_PROTOTYPE_FLOW = {
     menuPurchaseOrders: 'purchaseOrdersList',
     menuOutslips: 'outslipsList',
     menuDeliveryReceipts: 'deliveryList',
-    menuSettings: 'settings',
+    menuAccomplishments: 'accomplishmentsList',
   },
 
   // ── Quotations flow ───────────────────────────────────────────

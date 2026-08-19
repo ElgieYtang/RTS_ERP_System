@@ -1,9 +1,11 @@
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { AccomplishmentPage } from '@/pages/Accomplishment'
 import { BillingPage } from '@/pages/Billing'
 import { DashboardPage } from '@/pages/Dashboard'
 import { DeliveryReceiptsPage } from '@/pages/DeliveryReceipts'
 import { InventoryOverviewPage } from '@/pages/InventoryOverview'
+import { LoginPage } from '@/pages/Login'
 import { OutslipsPage } from '@/pages/Outslips'
 import { PurchaseOrdersPage } from '@/pages/PurchaseOrders'
 import { QuotationDetailPage } from '@/pages/details/QuotationDetailPage'
@@ -39,53 +41,56 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<AppLayout />}>
-          <Route index element={<DashboardPage />} />
-          <Route path="quotations" element={<QuotationsPage />} />
-          <Route path="quotations/:id" element={<QuotationDetailPage />} />
-          <Route path="quotations/:id/preview" element={<QuotationPreviewPage />} />
-          <Route path="purchase-order" element={<PurchaseOrdersPage />} />
-          <Route path="purchase-order/:id" element={<PurchaseOrderDetailPage />} />
-          <Route path="purchase-order/:id/preview" element={<PurchaseOrderPreviewPage />} />
-          <Route path="outslip" element={<OutslipsPage />} />
-          <Route path="outslip/:id" element={<OutslipDetailPage />} />
-          <Route path="delivery-receipt" element={<DeliveryReceiptsPage />} />
-          <Route path="delivery-receipt/:id" element={<DeliveryReceiptDetailPage />} />
-          <Route path="delivery-receipt/:id/preview" element={<DeliveryReceiptPreviewPage />} />
+        <Route path="/login" element={<LoginPage />} />
 
-          <Route path="setup/user-setup" element={<UserSetupPage />} />
-          <Route path="setup/company-setup" element={<CompanySetupPage />} />
-          <Route path="setup/branch-setup" element={<BranchSetupPage />} />
-          <Route path="setup/project-setup" element={<ProjectSetupPage />} />
-          <Route path="setup/position-setup" element={<PositionSetupPage />} />
-          <Route path="setup/category" element={<CategorySetupPage />} />
-          <Route path="setup/brand" element={<BrandSetupPage />} />
-          <Route path="setup/model" element={<ModelSetupPage />} />
-          <Route path="setup/unit-measure" element={<UnitMeasureSetupPage />} />
-          <Route path="setup/item" element={<ItemSetupPage />} />
-          <Route path="setup/supplier" element={<SupplierSetupPage />} />
-          <Route path="setup/customer" element={<CustomerSetupPage />} />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<AppLayout />}>
+            <Route index element={<DashboardPage />} />
+            <Route path="quotations" element={<QuotationsPage />} />
+            <Route path="quotations/:id" element={<QuotationDetailPage />} />
+            <Route path="quotations/:id/preview" element={<QuotationPreviewPage />} />
+            <Route path="purchase-order" element={<PurchaseOrdersPage />} />
+            <Route path="purchase-order/:id" element={<PurchaseOrderDetailPage />} />
+            <Route path="purchase-order/:id/preview" element={<PurchaseOrderPreviewPage />} />
+            <Route path="outslip" element={<OutslipsPage />} />
+            <Route path="outslip/:id" element={<OutslipDetailPage />} />
+            <Route path="delivery-receipt" element={<DeliveryReceiptsPage />} />
+            <Route path="delivery-receipt/:id" element={<DeliveryReceiptDetailPage />} />
+            <Route path="delivery-receipt/:id/preview" element={<DeliveryReceiptPreviewPage />} />
 
-          <Route path="settings" element={
-            <PlaceholderPage title="Settings" description="Configure system preferences and user settings." />
-          } />
+            <Route path="setup/user-setup" element={<UserSetupPage />} />
+            <Route path="setup/company-setup" element={<CompanySetupPage />} />
+            <Route path="setup/branch-setup" element={<BranchSetupPage />} />
+            <Route path="setup/project-setup" element={<ProjectSetupPage />} />
+            <Route path="setup/position-setup" element={<PositionSetupPage />} />
+            <Route path="setup/category" element={<CategorySetupPage />} />
+            <Route path="setup/brand" element={<BrandSetupPage />} />
+            <Route path="setup/model" element={<ModelSetupPage />} />
+            <Route path="setup/unit-measure" element={<UnitMeasureSetupPage />} />
+            <Route path="setup/item" element={<ItemSetupPage />} />
+            <Route path="setup/supplier" element={<SupplierSetupPage />} />
+            <Route path="setup/customer" element={<CustomerSetupPage />} />
 
-          {/* Legacy routes — components retained, not in sidebar */}
-          <Route path="purchase-orders" element={<Navigate to="/purchase-order" replace />} />
-          <Route path="purchase-orders/:id/preview" element={<Navigate to="/purchase-order" replace />} />
-          <Route path="delivery-receipts" element={<Navigate to="/delivery-receipt" replace />} />
-          <Route path="delivery-receipts/:id/preview" element={<Navigate to="/delivery-receipt" replace />} />
-          <Route path="inventory/outslips" element={<Navigate to="/outslip" replace />} />
-          <Route path="inventory" element={<InventoryOverviewPage />} />
-          <Route path="inventory/receiving" element={<ReceivingPage />} />
-          <Route path="billing" element={<BillingPage />} />
-          <Route path="soa" element={<SOAPage />} />
-          <Route path="soa/preview" element={<SOAPreviewPage />} />
-          <Route path="reports/accomplishment" element={<AccomplishmentPage />} />
-          <Route path="reports/accomplishment/preview" element={<AccomplishmentPreviewPage />} />
-          <Route path="customers" element={<Navigate to="/setup/customer" replace />} />
-          <Route path="suppliers" element={<Navigate to="/setup/supplier" replace />} />
-          <Route path="products" element={<Navigate to="/setup/item" replace />} />
+            <Route path="settings" element={
+              <PlaceholderPage title="Settings" description="Configure system preferences and user settings." />
+            } />
+
+            <Route path="purchase-orders" element={<Navigate to="/purchase-order" replace />} />
+            <Route path="purchase-orders/:id/preview" element={<Navigate to="/purchase-order" replace />} />
+            <Route path="delivery-receipts" element={<Navigate to="/delivery-receipt" replace />} />
+            <Route path="delivery-receipts/:id/preview" element={<Navigate to="/delivery-receipt" replace />} />
+            <Route path="inventory/outslips" element={<Navigate to="/outslip" replace />} />
+            <Route path="inventory" element={<InventoryOverviewPage />} />
+            <Route path="inventory/receiving" element={<ReceivingPage />} />
+            <Route path="billing" element={<BillingPage />} />
+            <Route path="soa" element={<SOAPage />} />
+            <Route path="soa/preview" element={<SOAPreviewPage />} />
+            <Route path="reports/accomplishment" element={<AccomplishmentPage />} />
+            <Route path="reports/accomplishment/preview" element={<AccomplishmentPreviewPage />} />
+            <Route path="customers" element={<Navigate to="/setup/customer" replace />} />
+            <Route path="suppliers" element={<Navigate to="/setup/supplier" replace />} />
+            <Route path="products" element={<Navigate to="/setup/item" replace />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>
