@@ -1,4 +1,4 @@
-import { mobileDrawerItems } from '@/config/mobileNavigation'
+import { mobileDrawerItems, mobileDrawerSectionLabels } from '@/config/mobileNavigation'
 import { cn } from '@/lib/utils'
 import { X } from 'lucide-react'
 import { MobileDrawerNavItem } from './MobileDrawerNavItem'
@@ -54,22 +54,28 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 py-4">
-          {mobileDrawerItems.map((item, index) => (
-            <div key={item.path}>
-              {index === 1 && (
-                <div className="mb-2 mt-1 px-3 text-[10px] font-semibold uppercase tracking-wider text-text-secondary">
-                  Transactions
-                </div>
-              )}
-              <MobileDrawerNavItem
-                to={item.path}
-                label={item.label}
-                icon={item.icon}
-                end={item.end}
-                onNavigate={onMobileClose}
-              />
-            </div>
-          ))}
+          {mobileDrawerItems.map((item, index) => {
+            const prevSection = mobileDrawerItems[index - 1]?.section
+            const showHeading =
+              item.section !== 'main' && item.section !== prevSection
+
+            return (
+              <div key={item.path}>
+                {showHeading && item.section !== 'main' && (
+                  <div className="mb-2 mt-4 px-3 text-[10px] font-semibold uppercase tracking-wider text-text-secondary first:mt-1">
+                    {mobileDrawerSectionLabels[item.section]}
+                  </div>
+                )}
+                <MobileDrawerNavItem
+                  to={item.path}
+                  label={item.label}
+                  icon={item.icon}
+                  end={item.end}
+                  onNavigate={onMobileClose}
+                />
+              </div>
+            )
+          })}
         </nav>
       </aside>
 

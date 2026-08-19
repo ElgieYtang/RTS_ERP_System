@@ -35,11 +35,12 @@ export const mobileDesignTokens = {
   phoneHeight: 844,
 } as const
 
-/** Drawer menu — Dashboard + transactions (no Setup, no Settings). */
+/** Drawer menu — Dashboard, transactions, and Settings. */
 export const mobileDrawerItems = [
   'Dashboard',
   'Quotations',
   'Purchase Orders',
   'Outslips',
   'Delivery Receipts',
+  'Settings',
 ] as const

@@ -10,6 +10,7 @@ const mobileTitles: Record<string, string> = {
   '/purchase-order': 'Purchase Orders',
   '/outslip': 'Outslip',
   '/delivery-receipt': 'Delivery Receipt',
+  '/settings': 'Settings',
 }
 
 function getMobileTitle(pathname: string) {
