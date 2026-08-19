@@ -8,8 +8,10 @@ const statusMap: Record<string, { variant: BadgeVariant; label: string }> = {
   cancelled: { variant: 'rejected', label: 'Cancelled' },
   completed: { variant: 'approved', label: 'Completed' },
   partial: { variant: 'pending', label: 'Partially Received' },
-  fully_received: { variant: 'approved', label: 'Fully Received' },
+  fully_received: { variant: 'approved', label: 'Completed' },
   released: { variant: 'approved', label: 'Released' },
+  for_dispatch: { variant: 'current', label: 'For Dispatch' },
+  active: { variant: 'current', label: 'Active' },
   delivered: { variant: 'approved', label: 'Delivered' },
   out_for_delivery: { variant: 'pending', label: 'Out for Delivery' },
   unpaid: { variant: 'pending', label: 'Unpaid' },
@@ -18,6 +20,7 @@ const statusMap: Record<string, { variant: BadgeVariant; label: string }> = {
   'In Stock': { variant: 'approved', label: 'In Stock' },
   'Low Stock': { variant: 'pending', label: 'Low Stock' },
   'Out of Stock': { variant: 'rejected', label: 'Out of Stock' },
+  Active: { variant: 'approved', label: 'Active' },
 }
 
 export function getStatusDisplay(status: string) {

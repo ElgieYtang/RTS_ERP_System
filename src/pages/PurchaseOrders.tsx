@@ -1,4 +1,6 @@
+import { StatusTabs } from '@/components/layout/Breadcrumbs'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { TransactionWorkflow } from '@/components/workflow/TransactionWorkflow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { TableActions } from '@/components/ui/action-menu'
@@ -13,17 +15,20 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { EmptyState, TableFilters } from '@/components/ui/table-filters'
+import { ResponsiveTable } from '@/components/ui/responsive-table'
 import { useDemo } from '@/context/DemoContext'
 import { formatCurrency } from '@/lib/format'
 import { getStatusDisplay } from '@/lib/status'
+import { useIsMobile } from '@/hooks/useIsMobile'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 export function PurchaseOrdersPage() {
   const { state, getCustomerName, showToast } = useDemo()
   const navigate = useNavigate()
+  const isMobile = useIsMobile()
   const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
+  const [statusFilter, setStatusFilter] = useState('pending')
   const [viewId, setViewId] = useState<string | null>(null)
 
   const filtered = useMemo(() => {
@@ -45,6 +50,11 @@ export function PurchaseOrdersPage() {
 
   const viewPo = viewId ? state.purchaseOrders.find((p) => p.id === viewId) : null
 
+  const openDetail = (id: string) => {
+    if (isMobile) navigate(`/purchase-order/${id}`)
+    else setViewId(id)
+  }
+
   const receiveItems = (poId: string) => {
     const po = state.purchaseOrders.find((p) => p.id === poId)
     if (po?.status === 'fully_received') {
@@ -56,18 +66,42 @@ export function PurchaseOrdersPage() {
 
   return (
     <div>
-      <PageHeader title="Purchase Orders" description="Manage purchase orders linked to approved quotations." />
+      <PageHeader
+        title="Purchase Order"
+        description="Manage purchase orders linked to approved quotations."
+        breadcrumbs={['Transaction', 'Purchase Order']}
+      />
+      <StatusTabs
+        active={statusFilter}
+        onChange={setStatusFilter}
+        tabs={[
+          { key: 'pending', label: 'Pending', count: state.purchaseOrders.filter((p) => p.status === 'pending').length },
+          { key: 'approved', label: 'Approved', count: state.purchaseOrders.filter((p) => p.status === 'approved').length },
+          { key: 'fully_received', label: 'Completed', count: state.purchaseOrders.filter((p) => p.status === 'fully_received').length },
+          { key: 'all', label: 'All', count: state.purchaseOrders.length },
+        ]}
+      />
       <TableFilters
         search={search}
         onSearchChange={setSearch}
-        statusFilter={statusFilter}
-        onStatusChange={setStatusFilter}
-        statusOptions={[
-          { value: 'pending', label: 'Pending' },
-          { value: 'approved', label: 'Approved' },
-          { value: 'fully_received', label: 'Fully Received' },
-        ]}
       />
+      <ResponsiveTable
+        emptyMessage="No purchase orders found."
+        mobileItems={filtered.map((po) => {
+          const st = getStatusDisplay(po.status)
+          return {
+            id: po.id,
+            title: po.id,
+            subtitle: getCustomerName(po.customerId),
+            badge: { label: st.label, variant: st.variant },
+            fields: [
+              { label: 'Date', value: po.date },
+              { label: 'Amount', value: formatCurrency(po.total) },
+            ],
+            onClick: () => openDetail(po.id),
+          }
+        })}
+        desktop={
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
@@ -90,7 +124,7 @@ export function PurchaseOrdersPage() {
               const st = getStatusDisplay(po.status)
               return (
                 <TableRow key={po.id}>
-                  <TableCell><TableLink onClick={() => setViewId(po.id)}>{po.id}</TableLink></TableCell>
+                  <TableCell><TableLink onClick={() => openDetail(po.id)}>{po.id}</TableLink></TableCell>
                   <TableCell>{po.referenceQuotationId ?? '—'}</TableCell>
                   <TableCell>{getCustomerName(po.customerId)}</TableCell>
                   <TableCell>{po.date}</TableCell>
@@ -98,10 +132,10 @@ export function PurchaseOrdersPage() {
                   <TableCell><Badge variant={st.variant}>{st.label}</Badge></TableCell>
                   <TableCell>
                     <TableActions
-                      onView={() => setViewId(po.id)}
+                      onView={() => openDetail(po.id)}
                       menuItems={[
-                        { label: 'Preview', onClick: () => navigate(`/purchase-orders/${po.id}/preview`) },
-                        { label: 'Print', onClick: () => { navigate(`/purchase-orders/${po.id}/preview`); setTimeout(() => window.print(), 300) } },
+                        { label: 'Preview', onClick: () => navigate(`/purchase-order/${po.id}/preview`) },
+                        { label: 'Print', onClick: () => { navigate(`/purchase-order/${po.id}/preview`); setTimeout(() => window.print(), 300) } },
                         { label: 'Receive Items', onClick: () => receiveItems(po.id) },
                       ]}
                     />
@@ -112,6 +146,8 @@ export function PurchaseOrdersPage() {
           )}
         </TableBody>
       </Table>
+        }
+      />
 
       <Modal open={!!viewPo} onClose={() => setViewId(null)} title="Purchase Order Details" size="lg">
         {viewPo && (
@@ -133,6 +169,10 @@ export function PurchaseOrdersPage() {
           </div>
         )}
       </Modal>
+
+      <div className="mt-6">
+        <TransactionWorkflow quotationId="QTN-00001" />
+      </div>
     </div>
   )
 }

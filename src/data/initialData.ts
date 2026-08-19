@@ -1,4 +1,16 @@
 import type { DemoState } from '@/types'
+import {
+  companyInfo,
+  setupBranches,
+  setupBrands,
+  setupCategories,
+  setupItems,
+  setupModels,
+  setupPositions,
+  setupProjects,
+  setupUnits,
+  setupUsers,
+} from '@/data/setupData'
 
 export const initialDemoState: DemoState = {
   workflowStage: 'billing',
@@ -332,7 +344,7 @@ export const initialDemoState: DemoState = {
       id: 'OS-00001',
       customerId: 'cust-abc',
       referencePoId: 'PO-00001',
-      date: 'August 17, 2026',
+      date: 'August 19, 2026',
       items: [
         {
           productId: 'prod-laptop',
@@ -341,13 +353,13 @@ export const initialDemoState: DemoState = {
           unitPrice: 40000,
         },
       ],
-      status: 'released',
+      status: 'for_dispatch',
     },
     {
       id: 'OS-00002',
       customerId: 'cust-cbs',
       referencePoId: 'PO-00003',
-      date: 'August 16, 2026',
+      date: 'August 18, 2026',
       items: [
         {
           productId: 'prod-desktop',
@@ -356,7 +368,22 @@ export const initialDemoState: DemoState = {
           unitPrice: 35000,
         },
       ],
-      status: 'pending',
+      status: 'approved',
+    },
+    {
+      id: 'OS-00003',
+      customerId: 'cust-pacific',
+      referencePoId: 'PO-00002',
+      date: 'August 18, 2026',
+      items: [
+        {
+          productId: 'prod-printer',
+          productName: 'Laser Printer',
+          quantity: 4,
+          unitPrice: 18500,
+        },
+      ],
+      status: 'for_dispatch',
     },
   ],
 
@@ -365,11 +392,11 @@ export const initialDemoState: DemoState = {
       id: 'DR-00001',
       customerId: 'cust-abc',
       referenceOutslipId: 'OS-00001',
-      date: 'August 17, 2026',
+      date: 'August 19, 2026',
       deliveryAddress: 'Cebu City, Cebu',
       driver: 'Pedro Santos',
       vehicle: 'ABC-1234',
-      status: 'delivered',
+      status: 'active',
     },
     {
       id: 'DR-00002',
@@ -442,4 +469,15 @@ export const initialDemoState: DemoState = {
       remarks: 'Transactions processed during the reporting period.',
     },
   ],
+
+  setupUsers,
+  setupBranches,
+  setupProjects,
+  setupPositions,
+  setupCategories,
+  setupBrands,
+  setupModels,
+  setupUnits,
+  setupItems,
+  companyInfo,
 }

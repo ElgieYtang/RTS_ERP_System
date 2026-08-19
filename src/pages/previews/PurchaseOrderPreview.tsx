@@ -35,7 +35,7 @@ export function PurchaseOrderPreviewPage() {
           Total: {formatCurrency(po.total)}
         </div>
       </DocumentLayout>
-      <PrintActions onBack={() => navigate('/purchase-orders')} />
+      <PrintActions onBack={() => navigate('/purchase-order')} />
     </div>
   )
 }

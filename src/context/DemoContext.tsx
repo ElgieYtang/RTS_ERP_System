@@ -25,7 +25,11 @@ interface DemoContextValue {
   convertQuotationToPO: (quotationId: string) => string | null
   updatePurchaseOrder: (id: string, data: Partial<DemoState['purchaseOrders'][0]>) => void
   confirmReceiving: (id: string) => void
+  approveOutslip: (id: string) => void
+  forDispatchOutslip: (id: string) => void
   releaseOutslip: (id: string) => void
+  createDeliveryFromOutslip: (outslipId: string) => string | null
+  markDeliveryOutForDelivery: (id: string) => void
   markDeliveryDelivered: (id: string) => void
   recordPayment: (billingId: string, amount: number, date: string, reference: string) => void
   generateSOA: () => void
@@ -184,14 +188,23 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     showToast('success', 'Receiving completed successfully. Inventory has been updated.')
   }, [showToast])
 
-  const releaseOutslip = useCallback((id: string) => {
+  const approveOutslip = useCallback((id: string) => {
+    setState((prev) => ({
+      ...prev,
+      outslips: prev.outslips.map((o) =>
+        o.id === id && o.status === 'pending' ? { ...o, status: 'approved' as const } : o,
+      ),
+    }))
+    showToast('success', 'Outslip approved successfully.')
+  }, [showToast])
+
+  const forDispatchOutslip = useCallback((id: string) => {
     setState((prev) => {
       const os = prev.outslips.find((o) => o.id === id)
-      if (!os || os.status === 'released') return prev
+      if (!os || os.status !== 'approved') return prev
 
       let products = [...prev.products]
       const movements = [...prev.stockMovements]
-
       os.items.forEach((item) => {
         const product = products.find((p) => p.id === item.productId)
         if (!product) return
@@ -207,13 +220,62 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         })
       })
 
-      const outslips = prev.outslips.map((o) =>
-        o.id === id ? { ...o, status: 'released' as const } : o,
-      )
-
-      return { ...prev, products, stockMovements: movements, outslips, workflowStage: 'outslip' }
+      return {
+        ...prev,
+        products,
+        stockMovements: movements,
+        outslips: prev.outslips.map((o) =>
+          o.id === id ? { ...o, status: 'for_dispatch' as const } : o,
+        ),
+        workflowStage: 'outslip',
+      }
     })
-    showToast('success', 'Outslip released successfully. Inventory has been updated.')
+    showToast('success', 'Outslip marked for dispatch. Inventory has been updated.')
+  }, [showToast])
+
+  const releaseOutslip = useCallback((id: string) => {
+    forDispatchOutslip(id)
+  }, [forDispatchOutslip])
+
+  const createDeliveryFromOutslip = useCallback((outslipId: string): string | null => {
+    const os = state.outslips.find((o) => o.id === outslipId)
+    if (!os || os.status !== 'for_dispatch') return null
+    const existing = state.deliveryReceipts.find((d) => d.referenceOutslipId === outslipId)
+    if (existing) return existing.id
+
+    const customer = state.customers.find((c) => c.id === os.customerId)
+    const num = state.deliveryReceipts.length + 1
+    const drId = `DR-${String(num).padStart(5, '0')}`
+
+    setState((prev) => ({
+      ...prev,
+      deliveryReceipts: [
+        ...prev.deliveryReceipts,
+        {
+          id: drId,
+          customerId: os.customerId,
+          referenceOutslipId: os.id,
+          date: 'August 19, 2026',
+          deliveryAddress: customer?.address ?? 'Cebu City, Cebu',
+          driver: 'Pedro Santos',
+          vehicle: 'ABC-1234',
+          status: 'active' as const,
+        },
+      ],
+      workflowStage: 'delivery',
+    }))
+    showToast('success', 'Delivery Receipt created successfully.')
+    return drId
+  }, [state.outslips, state.deliveryReceipts, state.customers, showToast])
+
+  const markDeliveryOutForDelivery = useCallback((id: string) => {
+    setState((prev) => ({
+      ...prev,
+      deliveryReceipts: prev.deliveryReceipts.map((dr) =>
+        dr.id === id && dr.status === 'active' ? { ...dr, status: 'out_for_delivery' as const } : dr,
+      ),
+    }))
+    showToast('success', 'Delivery marked as out for delivery.')
   }, [showToast])
 
   const markDeliveryDelivered = useCallback((id: string) => {
@@ -277,7 +339,11 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       convertQuotationToPO,
       updatePurchaseOrder,
       confirmReceiving,
+      approveOutslip,
+      forDispatchOutslip,
       releaseOutslip,
+      createDeliveryFromOutslip,
+      markDeliveryOutForDelivery,
       markDeliveryDelivered,
       recordPayment,
       generateSOA,
@@ -295,7 +361,11 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       convertQuotationToPO,
       updatePurchaseOrder,
       confirmReceiving,
+      approveOutslip,
+      forDispatchOutslip,
       releaseOutslip,
+      createDeliveryFromOutslip,
+      markDeliveryOutForDelivery,
       markDeliveryDelivered,
       recordPayment,
       generateSOA,

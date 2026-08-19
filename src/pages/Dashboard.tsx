@@ -1,7 +1,8 @@
-import { PageHeader } from '@/components/layout/PageHeader'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { MobileCardList } from '@/components/ui/mobile-card-list'
+import { PageHeader } from '@/components/layout/PageHeader'
 import { Card, CardContent } from '@/components/ui/card'
+import { ResponsiveTable } from '@/components/ui/responsive-table'
 import {
   Table,
   TableBody,
@@ -15,35 +16,21 @@ import { useDemo } from '@/context/DemoContext'
 import { formatCurrency } from '@/lib/format'
 import { getStatusDisplay } from '@/lib/status'
 import { cn } from '@/lib/utils'
-import { Check, CreditCard, FileText, Package, ShoppingCart, Truck } from 'lucide-react'
+import { Check, FileText, Package, ShoppingCart, Truck } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 const workflowStages = [
-  { key: 'quotation', label: 'Quotation', path: '/quotations' },
-  { key: 'purchase_order', label: 'Purchase Order', path: '/purchase-orders' },
-  { key: 'receiving', label: 'Receiving', path: '/inventory/receiving' },
-  { key: 'inventory', label: 'Inventory', path: '/inventory' },
-  { key: 'outslip', label: 'Outslip', path: '/inventory/outslips' },
-  { key: 'delivery', label: 'Delivery Receipt', path: '/delivery-receipts' },
-  { key: 'billing', label: 'Billing', path: '/billing' },
-  { key: 'soa', label: 'SOA', path: '/soa' },
-  { key: 'accomplishment', label: 'Accomplishment Report', path: '/reports/accomplishment' },
-] as const
-
-const recentRows = [
-  { id: 'QTN-00001', type: 'Quotation', customer: 'ABC Corporation', amount: '₱400,000', status: 'approved', path: '/quotations' },
-  { id: 'PO-00001', type: 'Purchase Order', customer: 'ABC Corporation', amount: '₱400,000', status: 'fully_received', path: '/purchase-orders' },
-  { id: 'REC-00001', type: 'Receiving', customer: 'TechSource Philippines', amount: '—', status: 'completed', path: '/inventory/receiving' },
-  { id: 'OS-00001', type: 'Outslip', customer: 'ABC Corporation', amount: '—', status: 'released', path: '/inventory/outslips' },
-  { id: 'DR-00001', type: 'Delivery Receipt', customer: 'ABC Corporation', amount: '—', status: 'delivered', path: '/delivery-receipts' },
-  { id: 'BS-00001', type: 'Billing', customer: 'ABC Corporation', amount: '₱400,000', status: 'unpaid', path: '/billing' },
+  { label: 'Quotation', path: '/quotations' },
+  { label: 'Purchase Order', path: '/purchase-order' },
+  { label: 'Outslip', path: '/outslip' },
+  { label: 'Delivery Receipt', path: '/delivery-receipt' },
 ]
 
-const attentionItems = [
-  { title: 'Quotation QTN-00002', desc: 'Cebu Business Solutions — Waiting for approval', path: '/quotations' },
-  { title: 'PO-00002', desc: '2 items remaining to be received', path: '/inventory/receiving' },
-  { title: 'DR-00002', desc: 'Delivery currently out for delivery', path: '/delivery-receipts' },
-  { title: 'BS-00001', desc: 'Payment outstanding', path: '/billing' },
+const quickTransactions = [
+  { label: 'Quotations', path: '/quotations', icon: FileText, countKey: 'pendingQuotations' as const },
+  { label: 'Purchase Orders', path: '/purchase-order', icon: ShoppingCart, countKey: 'pendingPO' as const },
+  { label: 'Outslips', path: '/outslip', icon: Package, countKey: 'pendingOutslips' as const },
+  { label: 'Delivery', path: '/delivery-receipt', icon: Truck, countKey: 'activeDeliveries' as const },
 ]
 
 export function DashboardPage() {
@@ -51,146 +38,240 @@ export function DashboardPage() {
   const navigate = useNavigate()
 
   const pendingQuotations = state.quotations.filter((q) => q.status === 'pending').length
-  const pendingReceiving = state.receivings.filter((r) => r.status === 'partial').length
-  const pendingDeliveries = state.deliveryReceipts.filter((d) => d.status === 'out_for_delivery').length
-  const pendingBilling = state.billingStatements.filter(
-    (b) => b.paymentStatus === 'unpaid' || b.paymentStatus === 'partially_paid',
+  const pendingOutslips = state.outslips.filter((o) => o.status === 'pending').length
+  const pendingPO = state.purchaseOrders.filter((p) => p.status === 'pending').length
+  const activeDeliveries = state.deliveryReceipts.filter(
+    (d) => d.status === 'out_for_delivery' || d.status === 'active',
   ).length
 
-  const outstandingSOA = state.billingStatements.reduce((sum, b) => {
-    return sum + b.amount - (b.paidAmount ?? 0)
-  }, 0)
+  const counts = {
+    pendingQuotations,
+    pendingOutslips,
+    pendingPO,
+    activeDeliveries,
+  }
 
-  const stats = [
-    { label: 'Pending Quotations', value: String(pendingQuotations), icon: FileText },
-    { label: 'Purchase Orders', value: String(state.purchaseOrders.length), icon: ShoppingCart },
-    { label: 'Pending Receiving', value: String(pendingReceiving), icon: Package },
-    { label: 'Pending Deliveries', value: String(pendingDeliveries), icon: Truck },
-    { label: 'For Billing', value: String(pendingBilling), icon: CreditCard },
-    { label: 'Outstanding SOA', value: formatCurrency(outstandingSOA), icon: FileText },
+  const recentRows = [
+    {
+      id: 'QTN-00001',
+      type: 'Quotation',
+      customer: 'ABC Corporation',
+      amount: formatCurrency(400000),
+      status: 'approved',
+      path: '/quotations/QTN-00001',
+    },
+    {
+      id: 'PO-00001',
+      type: 'Purchase Order',
+      customer: 'ABC Corporation',
+      amount: formatCurrency(400000),
+      status: 'fully_received',
+      path: '/purchase-order/PO-00001',
+    },
+    {
+      id: 'OS-00001',
+      type: 'Outslip',
+      customer: 'ABC Corporation',
+      amount: '—',
+      status: 'for_dispatch',
+      path: '/outslip/OS-00001',
+    },
+    {
+      id: 'DR-00001',
+      type: 'Delivery Receipt',
+      customer: 'ABC Corporation',
+      amount: '—',
+      status: 'active',
+      path: '/delivery-receipt/DR-00001',
+    },
   ]
 
   const currentStage = state.workflowStage
+  const stageKeys = ['quotation', 'purchase_order', 'outslip', 'delivery'] as const
 
-  const getStageStatus = (key: string) => {
-    const order = workflowStages.map((s) => s.key)
-    const currentIdx = order.indexOf(currentStage)
-    const idx = order.indexOf(key as typeof workflowStages[number]['key'])
-    if (idx < currentIdx) return 'completed'
-    if (idx === currentIdx) return 'current'
+  const getStageStatus = (index: number) => {
+    const currentIdx = stageKeys.indexOf(
+      currentStage === 'receiving' || currentStage === 'inventory'
+        ? 'outslip'
+        : currentStage === 'billing' || currentStage === 'soa' || currentStage === 'accomplishment'
+          ? 'delivery'
+          : (currentStage as (typeof stageKeys)[number]),
+    )
+    if (index < currentIdx) return 'completed'
+    if (index === currentIdx) return 'current'
     return 'future'
   }
 
   return (
     <div>
-      <PageHeader
-        title="Dashboard"
-        description="Overview of current transactions and workflow status."
-      />
+      {/* Mobile dashboard */}
+      <div className="md:hidden">
+        <div className="mb-5">
+          <h1 className="text-xl font-bold text-text-primary">Good morning, Admin</h1>
+          <p className="mt-1 text-sm text-text-secondary">
+            Here&apos;s an overview of today&apos;s transactions.
+          </p>
+        </div>
 
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {stats.map((stat) => (
-          <Card key={stat.label}>
-            <CardContent className="pt-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-text-secondary">{stat.label}</p>
-                  <p className="mt-2 text-2xl font-semibold text-text-primary">{stat.value}</p>
-                </div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-maroon-light">
-                  <stat.icon className="h-5 w-5 text-maroon" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        <div className="-mx-4 mb-6 flex gap-3 overflow-x-auto px-4 pb-1">
+          <div className="min-w-[160px] flex-1 rounded-xl border border-border bg-surface p-4">
+            <p className="text-xs text-text-secondary">Pending Quotations</p>
+            <p className="mt-2 text-3xl font-bold text-maroon">{pendingQuotations}</p>
+            <p className="mt-1 text-xs text-text-secondary">Needs attention</p>
+          </div>
+          <div className="min-w-[160px] flex-1 rounded-xl border border-border bg-surface p-4">
+            <p className="text-xs text-text-secondary">Pending Outslips</p>
+            <p className="mt-2 text-3xl font-bold text-maroon">{pendingOutslips}</p>
+            <p className="mt-1 text-xs text-text-secondary">Awaiting approval</p>
+          </div>
+        </div>
+
+        <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-text-secondary">
+          Quick Transactions
+        </p>
+        <div className="-mx-4 mb-6 flex gap-3 overflow-x-auto px-4 pb-1">
+          {quickTransactions.map((item) => (
+            <button
+              key={item.label}
+              type="button"
+              onClick={() => navigate(item.path)}
+              className="flex min-w-[120px] flex-col rounded-xl border border-border bg-surface p-3 text-left active:bg-maroon-light"
+            >
+              <item.icon className="h-5 w-5 text-maroon" />
+              <p className="mt-2 text-sm font-medium text-text-primary">{item.label}</p>
+              <p className="mt-0.5 text-xs text-text-secondary">
+                {counts[item.countKey]} Pending
+              </p>
+            </button>
+          ))}
+        </div>
+
+        <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-text-secondary">
+          Recent Transactions
+        </p>
+        <MobileCardList
+          variant="transaction"
+          items={recentRows.map((tx) => {
+            const st = getStatusDisplay(tx.status)
+            return {
+              id: tx.id,
+              title: tx.id,
+              subtitle: tx.customer,
+              meta: tx.type,
+              amount: tx.amount,
+              badge: { label: st.label, variant: st.variant },
+              onClick: () => navigate(tx.path),
+            }
+          })}
+        />
       </div>
 
-      <Card className="mb-6">
-        <CardContent className="pt-4">
-          <h2 className="mb-4 text-base font-semibold text-text-primary">Demo Workflow</h2>
-          <div className="flex flex-wrap gap-2">
-            {workflowStages.map((stage) => {
-              const status = getStageStatus(stage.key)
-              return (
-                <button
-                  key={stage.key}
-                  type="button"
-                  onClick={() => navigate(stage.path)}
-                  className={cn(
-                    'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                    status === 'completed' && 'bg-[#DCFCE7] text-[#15803D] hover:bg-[#bbf7d0]',
-                    status === 'current' && 'bg-maroon text-white hover:bg-maroon-dark',
-                    status === 'future' && 'bg-draft text-text-secondary hover:bg-border',
-                  )}
-                >
-                  {status === 'completed' && <Check className="h-4 w-4" />}
-                  {status === 'current' && <span className="h-2 w-2 rounded-full bg-white" />}
-                  {stage.label}
-                </button>
-              )
-            })}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Desktop dashboard */}
+      <div className="hidden md:block">
+        <PageHeader
+          title="Dashboard"
+          description="Overview of current transactions and workflow status."
+        />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <h2 className="mb-3 text-base font-semibold text-text-primary">Recent Transactions</h2>
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead>Document No.</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {recentRows.map((tx) => {
-                const st = getStatusDisplay(tx.status)
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { label: 'Pending Quotations', value: String(pendingQuotations), icon: FileText },
+            { label: 'Purchase Orders', value: String(state.purchaseOrders.length), icon: ShoppingCart },
+            { label: 'Pending Outslips', value: String(pendingOutslips), icon: Truck },
+            { label: 'Active Deliveries', value: String(activeDeliveries), icon: Truck },
+          ].map((stat) => (
+            <Card key={stat.label}>
+              <CardContent className="pt-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm text-text-secondary">{stat.label}</p>
+                    <p className="mt-2 text-2xl font-semibold text-text-primary">{stat.value}</p>
+                  </div>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-maroon-light">
+                    <stat.icon className="h-5 w-5 text-maroon" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <Card className="mb-6">
+          <CardContent className="pt-4">
+            <h2 className="mb-4 text-base font-semibold text-text-primary">Demo Workflow</h2>
+            <div className="flex flex-wrap gap-2">
+              {workflowStages.map((stage, index) => {
+                const status = getStageStatus(index)
                 return (
-                  <TableRow key={tx.id}>
-                    <TableCell>
-                      <TableLink onClick={() => navigate(tx.path)}>{tx.id}</TableLink>
-                    </TableCell>
-                    <TableCell>{tx.type}</TableCell>
-                    <TableCell>{tx.customer}</TableCell>
-                    <TableCell>{tx.amount}</TableCell>
-                    <TableCell>
-                      <Badge variant={st.variant}>{st.label}</Badge>
-                    </TableCell>
-                  </TableRow>
+                  <button
+                    key={stage.label}
+                    type="button"
+                    onClick={() => navigate(stage.path)}
+                    className={cn(
+                      'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                      status === 'completed' && 'bg-[#DCFCE7] text-[#15803D] hover:bg-[#bbf7d0]',
+                      status === 'current' && 'bg-maroon text-white hover:bg-maroon-dark',
+                      status === 'future' && 'bg-draft text-text-secondary hover:bg-border',
+                    )}
+                  >
+                    {status === 'completed' && <Check className="h-4 w-4" />}
+                    {status === 'current' && <span className="h-2 w-2 rounded-full bg-white" />}
+                    {stage.label}
+                  </button>
                 )
               })}
-            </TableBody>
-          </Table>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
 
-        <div>
-          <h2 className="mb-3 text-base font-semibold text-text-primary">Needs Attention</h2>
-          <Card className="border-maroon/20">
-            <CardContent className="pt-4">
-              <ul className="space-y-4">
-                {attentionItems.map((item) => (
-                  <li key={item.title} className="text-sm">
-                    <p className="font-medium text-text-primary">{item.title}</p>
-                    <p className="mt-0.5 text-text-secondary">{item.desc}</p>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="mt-1 h-auto px-0 text-maroon"
-                      onClick={() => navigate(item.path)}
-                    >
-                      View
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
+        <h2 className="mb-3 text-base font-semibold text-text-primary">Recent Transactions</h2>
+        <ResponsiveTable
+          mobileItems={recentRows.map((tx) => {
+            const st = getStatusDisplay(tx.status)
+            return {
+              id: tx.id,
+              title: tx.id,
+              subtitle: tx.customer,
+              badge: { label: st.label, variant: st.variant },
+              fields: [
+                { label: 'Type', value: tx.type },
+                { label: 'Amount', value: tx.amount },
+              ],
+              onClick: () => navigate(tx.path),
+            }
+          })}
+          desktop={
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead>Document No.</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {recentRows.map((tx) => {
+                  const st = getStatusDisplay(tx.status)
+                  return (
+                    <TableRow key={tx.id}>
+                      <TableCell>
+                        <TableLink onClick={() => navigate(tx.path)}>{tx.id}</TableLink>
+                      </TableCell>
+                      <TableCell>{tx.type}</TableCell>
+                      <TableCell>{tx.customer}</TableCell>
+                      <TableCell>{tx.amount}</TableCell>
+                      <TableCell>
+                        <Badge variant={st.variant}>{st.label}</Badge>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          }
+        />
       </div>
     </div>
   )

@@ -1,10 +1,10 @@
 export const COMPANY_NAME = 'ResponsivCode Technology Solutions'
 
 export type QuotationStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'cancelled'
-export type POStatus = 'pending' | 'approved' | 'fully_received' | 'cancelled'
+export type POStatus = 'pending' | 'approved' | 'fully_received' | 'completed' | 'cancelled'
 export type ReceivingStatus = 'completed' | 'partial'
-export type OutslipStatus = 'pending' | 'released' | 'cancelled'
-export type DeliveryStatus = 'out_for_delivery' | 'delivered'
+export type OutslipStatus = 'pending' | 'approved' | 'for_dispatch' | 'released' | 'cancelled'
+export type DeliveryStatus = 'active' | 'out_for_delivery' | 'delivered'
 export type PaymentStatus = 'unpaid' | 'partially_paid' | 'paid'
 export type ProductStockStatus = 'In Stock' | 'Low Stock' | 'Out of Stock'
 
@@ -141,6 +141,85 @@ export interface AccomplishmentReport {
   remarks: string
 }
 
+export interface SetupUser {
+  id: string
+  name: string
+  username: string
+  position: string
+  branch: string
+  status: string
+}
+
+export interface SetupBranch {
+  code: string
+  name: string
+  address: string
+  contact: string
+  status: string
+}
+
+export interface SetupProject {
+  code: string
+  name: string
+  customer: string
+  branch: string
+  startDate: string
+  endDate: string
+  status: string
+}
+
+export interface SetupPosition {
+  name: string
+  description: string
+  status: string
+}
+
+export interface SetupCategory {
+  code: string
+  name: string
+  description: string
+  status: string
+}
+
+export interface SetupBrand {
+  code: string
+  name: string
+  status: string
+}
+
+export interface SetupModel {
+  brand: string
+  name: string
+  description: string
+  status: string
+}
+
+export interface SetupUnitMeasure {
+  code: string
+  name: string
+  description: string
+  status: string
+}
+
+export interface SetupItem {
+  code: string
+  name: string
+  category: string
+  brand: string
+  model: string
+  unit: string
+  description: string
+  status: string
+}
+
+export interface CompanyInfo {
+  name: string
+  address: string
+  phone: string
+  email: string
+  taxInfo: string
+}
+
 export interface DemoState {
   customers: Customer[]
   suppliers: Supplier[]
@@ -155,4 +234,14 @@ export interface DemoState {
   soaPayments: SOAPayment[]
   accomplishmentReports: AccomplishmentReport[]
   workflowStage: 'quotation' | 'purchase_order' | 'receiving' | 'inventory' | 'outslip' | 'delivery' | 'billing' | 'soa' | 'accomplishment'
+  setupUsers: SetupUser[]
+  setupBranches: SetupBranch[]
+  setupProjects: SetupProject[]
+  setupPositions: SetupPosition[]
+  setupCategories: SetupCategory[]
+  setupBrands: SetupBrand[]
+  setupModels: SetupModel[]
+  setupUnits: SetupUnitMeasure[]
+  setupItems: SetupItem[]
+  companyInfo: CompanyInfo
 }

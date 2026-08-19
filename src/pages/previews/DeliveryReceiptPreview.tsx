@@ -39,7 +39,7 @@ export function DeliveryReceiptPreviewPage() {
           </div>
         )}
       </DocumentLayout>
-      <PrintActions onBack={() => navigate('/delivery-receipts')} />
+      <PrintActions onBack={() => navigate('/delivery-receipt')} />
     </div>
   )
 }

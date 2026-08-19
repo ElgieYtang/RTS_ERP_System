@@ -1,3 +1,4 @@
+import { StatusTabs } from '@/components/layout/Breadcrumbs'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -15,20 +16,23 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { EmptyState, TableFilters } from '@/components/ui/table-filters'
+import { ResponsiveTable } from '@/components/ui/responsive-table'
 import { QuotationWorkflow } from '@/components/workflow/quotationWorkflow'
 import { useDemo } from '@/context/DemoContext'
 import { formatCurrency } from '@/lib/format'
 import { getStatusDisplay } from '@/lib/status'
 import type { Quotation } from '@/types'
 import { Plus } from 'lucide-react'
+import { useIsMobile } from '@/hooks/useIsMobile'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 export function QuotationsPage() {
   const { state, getCustomerName, updateQuotation, cancelQuotation, convertQuotationToPO, showToast } = useDemo()
   const navigate = useNavigate()
+  const isMobile = useIsMobile()
   const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
+  const [statusFilter, setStatusFilter] = useState('pending')
   const [viewId, setViewId] = useState<string | null>(null)
   const [editId, setEditId] = useState<string | null>(null)
   const [cancelId, setCancelId] = useState<string | null>(null)
@@ -47,11 +51,18 @@ export function QuotationsPage() {
     if (statusFilter !== 'all') {
       list = list.filter((qt) => qt.status === statusFilter)
     }
+    const order = ['pending', 'approved', 'rejected', 'draft', 'cancelled']
+    list.sort((a, b) => order.indexOf(a.status) - order.indexOf(b.status))
     return list
   }, [state.quotations, search, statusFilter, getCustomerName])
 
   const viewQtn = viewId ? state.quotations.find((q) => q.id === viewId) : null
   const editQtn = editId ? state.quotations.find((q) => q.id === editId) : null
+
+  const openDetail = (id: string) => {
+    if (isMobile) navigate(`/quotations/${id}`)
+    else setViewId(id)
+  }
 
   const openEdit = (q: Quotation) => {
     setEditId(q.id)
@@ -68,7 +79,7 @@ export function QuotationsPage() {
   const handleConvertPO = (qtnId: string) => {
     const poId = convertQuotationToPO(qtnId)
     if (poId) {
-      navigate('/purchase-orders')
+      navigate('/purchase-order')
       showToast('info', `Showing ${poId}`)
     }
   }
@@ -77,71 +88,92 @@ export function QuotationsPage() {
     <div>
       <PageHeader
         title="Quotations"
-        description="Create and manage customer quotations."
+        description="Manage and track customer quotations."
+        breadcrumbs={['Transaction', 'Quotations']}
         action={<Button><Plus className="h-4 w-4" />New Quotation</Button>}
+      />
+      <StatusTabs
+        active={statusFilter}
+        onChange={setStatusFilter}
+        tabs={[
+          { key: 'pending', label: 'Pending', count: state.quotations.filter((q) => q.status === 'pending').length },
+          { key: 'approved', label: 'Approved', count: state.quotations.filter((q) => q.status === 'approved').length },
+          { key: 'rejected', label: 'Rejected', count: state.quotations.filter((q) => q.status === 'rejected').length },
+          { key: 'all', label: 'All', count: state.quotations.length },
+        ]}
       />
       <TableFilters
         search={search}
         onSearchChange={setSearch}
         searchPlaceholder="Search quotations..."
-        statusFilter={statusFilter}
-        onStatusChange={setStatusFilter}
-        statusOptions={[
-          { value: 'pending', label: 'Pending' },
-          { value: 'approved', label: 'Approved' },
-          { value: 'rejected', label: 'Rejected' },
-          { value: 'draft', label: 'Draft' },
-          { value: 'cancelled', label: 'Cancelled' },
-        ]}
       />
-      <Table>
-        <TableHeader>
-          <TableRow className="hover:bg-transparent">
-            <TableHead>Quotation No.</TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Amount</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filtered.length === 0 ? (
-            <TableRow className="hover:bg-transparent">
-              <TableCell colSpan={6}><EmptyState /></TableCell>
-            </TableRow>
-          ) : (
-            filtered.map((q) => {
-              const st = getStatusDisplay(q.status)
-              return (
-                <TableRow key={q.id}>
-                  <TableCell><TableLink onClick={() => setViewId(q.id)}>{q.id}</TableLink></TableCell>
-                  <TableCell>{getCustomerName(q.customerId)}</TableCell>
-                  <TableCell>{q.date}</TableCell>
-                  <TableCell>{formatCurrency(q.total)}</TableCell>
-                  <TableCell><Badge variant={st.variant}>{st.label}</Badge></TableCell>
-                  <TableCell>
-                    <TableActions
-                      onView={() => setViewId(q.id)}
-                      menuItems={[
-                        { label: 'Edit', onClick: () => openEdit(q) },
-                        { label: 'Preview', onClick: () => navigate(`/quotations/${q.id}/preview`) },
-                        { label: 'Print', onClick: () => { navigate(`/quotations/${q.id}/preview`); setTimeout(() => window.print(), 300) } },
-                        ...(q.status === 'approved'
-                          ? [{ label: 'Convert to PO', onClick: () => handleConvertPO(q.id) }]
-                          : []),
-                        ...(q.status !== 'cancelled'
-                          ? [{ label: 'Cancel', onClick: () => setCancelId(q.id), destructive: true }]
-                          : []),
-                      ]}
-                    />
-                  </TableCell>
+      <ResponsiveTable
+        emptyMessage="No quotations found."
+        mobileItems={filtered.map((q) => {
+          const st = getStatusDisplay(q.status)
+          return {
+            id: q.id,
+            title: q.id,
+            subtitle: getCustomerName(q.customerId),
+            badge: { label: st.label, variant: st.variant },
+            fields: [
+              { label: 'Date', value: q.date },
+              { label: 'Amount', value: formatCurrency(q.total) },
+            ],
+            onClick: () => openDetail(q.id),
+          }
+        })}
+        desktop={
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead>Quotation No.</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.length === 0 ? (
+                <TableRow className="hover:bg-transparent">
+                  <TableCell colSpan={6}><EmptyState /></TableCell>
                 </TableRow>
-              )
-            })
-          )}
-        </TableBody>
-      </Table>
+              ) : (
+                filtered.map((q) => {
+                  const st = getStatusDisplay(q.status)
+                  return (
+                    <TableRow key={q.id}>
+                      <TableCell><TableLink onClick={() => openDetail(q.id)}>{q.id}</TableLink></TableCell>
+                      <TableCell>{getCustomerName(q.customerId)}</TableCell>
+                      <TableCell>{q.date}</TableCell>
+                      <TableCell>{formatCurrency(q.total)}</TableCell>
+                      <TableCell><Badge variant={st.variant}>{st.label}</Badge></TableCell>
+                      <TableCell>
+                        <TableActions
+                          onView={() => openDetail(q.id)}
+                          menuItems={[
+                            { label: 'Edit', onClick: () => openEdit(q) },
+                            { label: 'Preview', onClick: () => navigate(`/quotations/${q.id}/preview`) },
+                            { label: 'Print', onClick: () => { navigate(`/quotations/${q.id}/preview`); setTimeout(() => window.print(), 300) } },
+                            ...(q.status === 'approved'
+                              ? [{ label: 'Convert to PO', onClick: () => handleConvertPO(q.id) }]
+                              : []),
+                            ...(q.status !== 'cancelled'
+                              ? [{ label: 'Cancel', onClick: () => setCancelId(q.id), destructive: true }]
+                              : []),
+                          ]}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
+              )}
+            </TableBody>
+          </Table>
+        }
+      />
 
       <Modal open={!!viewQtn} onClose={() => setViewId(null)} title="Quotation Details" size="lg">
         {viewQtn && (
