@@ -64,9 +64,10 @@ src/
 
 | Token | Color | Usage |
 |-------|-------|-------|
-| Primary Maroon | `#8B1E3F` | Sidebar, primary buttons, active accents |
-| Dark Maroon | `#6F1832` | Hover states |
-| Light Maroon | `#F8E9EE` | Active nav, row hover, workflow accents |
+| Primary Maroon | `#A30F23` | Sidebar, primary buttons, active accents (logo red) |
+| Dark Maroon | `#821019` | Hover states |
+| Light Maroon | `#FCE8EC` | Active nav, row hover, workflow accents |
+| Brand Orange | `#F9A61A` | Logo accent (secondary highlights) |
 | Page Background | `#F7F7F8` | Main content area |
 | Surface | `#FFFFFF` | Cards, tables, forms |
 | Text Primary | `#252525` | Titles, body text |

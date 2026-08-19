@@ -1,7 +1,8 @@
 export const colors = {
-  maroon: '#8B1E3F',
-  maroonDark: '#6F1832',
-  maroonLight: '#F8E9EE',
+  maroon: '#A30F23',
+  maroonDark: '#821019',
+  maroonLight: '#FCE8EC',
+  brandOrange: '#F9A61A',
   white: '#FFFFFF',
   page: '#F7F7F8',
   textPrimary: '#252525',

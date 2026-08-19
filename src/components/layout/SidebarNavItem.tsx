@@ -26,8 +26,8 @@ export function SidebarNavItem({
           'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-150',
           indent && 'ml-4',
           isActive
-            ? 'mx-2 bg-maroon-light text-maroon'
-            : 'text-white/85 hover:bg-maroon-dark hover:text-white',
+            ? 'mx-2 bg-maroon-light text-maroon font-semibold'
+            : 'text-white/90 hover:bg-maroon-dark hover:text-white',
         )
       }
     >

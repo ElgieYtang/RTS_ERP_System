@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --color-maroon: #8B1E3F;
-  --color-maroon-dark: #6F1832;
-  --color-maroon-light: #F8E9EE;
+  --color-maroon: #A30F23;
+  --color-maroon-dark: #821019;
+  --color-maroon-light: #FCE8EC;
+  --color-brand-orange: #F9A61A;
   --color-surface: #FFFFFF;
   --color-page: #F7F7F8;
   --color-text-primary: #252525;
